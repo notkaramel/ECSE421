@@ -11,6 +11,7 @@ int clkState, dtState, swState;
 
 void setup()
 {
+    // Initialize the serial communication and the pins
     Serial.begin(9600);
     pinMode(CLK_PIN, INPUT);
     pinMode(DT_PIN, INPUT);
