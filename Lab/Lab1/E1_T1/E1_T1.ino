@@ -4,8 +4,10 @@
 #define B_PIN 6
 
 /**
- * Write color in RGB value
+ * Write color in RGB digital value
  * @param r (0,1)
+ * @param g (0,1)
+ * @param b (0,1)
  */
 void setColor(int r, int g, int b)
 {
@@ -14,17 +16,8 @@ void setColor(int r, int g, int b)
     digitalWrite(B_PIN, b);
 }
 
-void task1()
-{
-    setColor(1, 1, 1);
-    delay(500);
-    setColor(0, 0, 0);
-    delay(500);
-}
-
 void setup()
 {
-    Serial.begin(9600);
     pinMode(R_PIN, OUTPUT);
     pinMode(G_PIN, OUTPUT);
     pinMode(B_PIN, OUTPUT);
@@ -32,5 +25,8 @@ void setup()
 
 void loop()
 {
-    // task1();
+    setColor(1, 1, 1);
+    delay(500);
+    setColor(0, 0, 0);
+    delay(500);
 }

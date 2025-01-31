@@ -3,9 +3,13 @@
 #define G_PIN 5
 #define B_PIN 6
 
+#define BLINK_MS 83
+
 /**
- * Write color in RGB value
+ * Write color in RGB digital value
  * @param r (0,1)
+ * @param g (0,1)
+ * @param b (0,1)
  */
 void setColor(int r, int g, int b)
 {
@@ -14,34 +18,26 @@ void setColor(int r, int g, int b)
     digitalWrite(B_PIN, b);
 }
 
-void task2()
-{
-    setColor(1, 0, 0);
-    delay(500);
-    setColor(0, 1, 0);
-    delay(500);
-    setColor(0, 0, 1);
-    delay(500);
-    setColor(1, 1, 0);
-    delay(500);
-    setColor(1, 0, 1);
-    delay(500);
-    setColor(0, 1, 1);
-    delay(500);
-    setColor(1, 1, 1);
-    delay(500);
-}
-
 void setup()
 {
-    Serial.begin(9600);
     pinMode(R_PIN, OUTPUT);
     pinMode(G_PIN, OUTPUT);
     pinMode(B_PIN, OUTPUT);
 }
 
+
 void loop()
 {
-    // task1();
-    task2();
+    setColor(1, 0, 0);
+    delay(BLINK_MS);
+    setColor(0, 1, 0);
+    delay(BLINK_MS);
+    setColor(0, 0, 1);
+    delay(BLINK_MS);
+    setColor(1, 1, 0);
+    delay(BLINK_MS);
+    setColor(1, 0, 1);
+    delay(BLINK_MS);
+    setColor(0, 1, 1);
+    delay(BLINK_MS);
 }
