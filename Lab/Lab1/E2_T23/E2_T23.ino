@@ -1,5 +1,6 @@
 /*
-- TODO: Task: Use the rotary encoder to select the buzzing frequency of the buzzer. Using the serial plotter and the microphone, find the approximate frequency at which the buzzer appears to be the loudest from the microphone's point of view.
+Task 2: Use the rotary encoder to select the buzzing frequency of the buzzer. Using the serial plotter and the microphone, find the approximate frequency at which the buzzer appears to be the loudest from the microphone's point of view.
+Task 3: Repeat the previous task with the other microphone module. How does the sensitivity change?
 */
 
 #define CLK_PIN 2
@@ -32,7 +33,6 @@ void setup()
 
 void loop()
 {
-
     // Read the state of the CLK and DT pins
     clkState = digitalRead(CLK_PIN);
     dtState = digitalRead(DT_PIN);
@@ -42,13 +42,14 @@ void loop()
     // Clockwise detection when CLK changes before DT
     if (clkState == 1 && dtState == 0) { // Decrease counter
         counter++;
-        delay(100);
+        tone(BUZZER, 440 + counter*10);
+        delay(100); // delay to avoid hardware debouncing
     } else if (clkState == 0 && dtState == 1) { // Increase counter
         counter--;
         delay(100);
     }
     
-    tone(BUZZER, 440 + counter*10);
+    // Output the frequency (Hz) and the mic analog value
     Serial.print(440 + counter*10);
     Serial.print(" ");
     Serial.println(mic);

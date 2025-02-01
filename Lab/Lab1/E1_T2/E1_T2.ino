@@ -28,6 +28,7 @@ void setup()
 
 void loop()
 {
+    // Blink every color every 83ms (~500ms/6)
     setColor(1, 0, 0);
     delay(BLINK_MS);
     setColor(0, 1, 0);

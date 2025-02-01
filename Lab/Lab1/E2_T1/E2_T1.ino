@@ -37,12 +37,12 @@ void loop()
         counter++;
         Serial.print("Counter: ");
         Serial.println(counter);
-        delay(200);
+        delay(150); // delay to avoid hardware debouncing
     } else if (clkState == 0 && dtState == 1) { // Increase counter
         counter--;
         // Output the counter value
         Serial.print("Counter: ");
         Serial.println(counter);
-        delay(200);
+        delay(150);
     }
 }

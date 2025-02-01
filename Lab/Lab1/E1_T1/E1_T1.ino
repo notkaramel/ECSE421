@@ -25,6 +25,7 @@ void setup()
 
 void loop()
 {
+    // Blinking white light every 500ms
     setColor(1, 1, 1);
     delay(500);
     setColor(0, 0, 0);
