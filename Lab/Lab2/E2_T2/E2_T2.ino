@@ -530,6 +530,7 @@ void loop() {
     lightPrevTime = 0;
   }
 
+  // Change shade direction based on shade state
   switch (shadeState) {
     case 0:
       shadeDirection = "Idle";
