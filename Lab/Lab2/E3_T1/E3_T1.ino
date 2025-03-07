@@ -23,7 +23,6 @@ byte rowPins[ROWS] = { A3, A2, A1, A0 };
 
 #define LED_R 6
 #define LED_G 7
-#define LED_B 8
 
 #define BUZZER 10
 #define MAGNETIC 11
@@ -35,22 +34,22 @@ Keypad kp = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 int distanceCM, tamperDetection;
 
 // System variables
-int presence = 0, tamper = 0, N = 0, pinStatus = 0, systemStatus = 0;
-char input[6], PIN[5] = "2143C";
+int presence = 0, tamper = 0, N = 0, pinStatus = 0, systemStatus = 0, attempts = 0;
+char input[5], PIN[5] = "3333A";
 
 // Timer tracking for no delay
 int refreshTime = 100;  // ms
-unsigned long tCurr = 0, tPrev = 0, tTamper = 0, tPin = 0, tPanic = 0, tRed = 0;
+unsigned long tCurr = 0, tPrev = 0, tTamper = 0, tPin = 0, tPanic = 0, tBlink = 0;
 
 void setup() {
   pinMode(MAGNETIC, INPUT);
   pinMode(BUZZER, OUTPUT);
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
-  pinMode(LED_B, OUTPUT);
   Serial.begin(9600);
 }
 
+// ============= KEYPAD =============
 void clearInput() {
   for (int i = 0; i < 5; i++) {
     input[i] = ' ';
@@ -64,13 +63,15 @@ Returns a value for pinStatus
 bool verifyPIN() {
   for (int i = 0; i < 5; i++) {
     if (input[i] != PIN[i]) {
+      clearInput();
       return false;
     }
   }
+  clearInput();
   return true;
 }
 
-
+// ============= BUZZER =============
 // Three state of Buzzer: none, warning, panic
 void warningTone() {
   tone(BUZZER, 300);
@@ -85,92 +86,191 @@ void stopTone() {
   noTone(BUZZER);
 }
 
-// LED colouring
+// ============= LED ============= //
 void green() {
   digitalWrite(LED_R, LOW);
   digitalWrite(LED_G, HIGH);
-  digitalWrite(LED_B, LOW);
 }
 
 void red() {
   digitalWrite(LED_R, HIGH);
   digitalWrite(LED_G, LOW);
-  digitalWrite(LED_B, LOW);
 }
 
 void orange() {
   digitalWrite(LED_R, HIGH);
   digitalWrite(LED_G, HIGH);
-  digitalWrite(LED_B, LOW);
 }
 
+bool blinkToggle = false;
 void blinkingRed() {
-  // Red for some time
-  digitalWrite(LED_R, HIGH);
-  digitalWrite(LED_G, LOW);
-  digitalWrite(LED_B, LOW);
+  if (tBlink == 0) tBlink = tCurr;  // set starting time stamp
 
-  delay(200);
+  if (tCurr - tBlink >= 200) {
+    blinkToggle = !blinkToggle;
+    tBlink = tCurr;
+  }
 
-  // Blank for some time
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, LOW);
-  digitalWrite(LED_B, LOW);
-
-  delay(200);
+  if (blinkToggle) {
+    // Red for some time
+    digitalWrite(LED_R, HIGH);
+    digitalWrite(LED_G, LOW);
+  } else {
+    // Blank for some time
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_G, LOW);
+  }
 }
 
+// ============= CONTROL SYSTEM ============= //
+unsigned long tDectection = 0;
+bool wait = false;
 
+void controlSystem() {
+  switch (systemStatus) {
+    case 0:  // Disarmed, green light
+      if (pinStatus == 1) {
+        systemStatus = 2;
+        pinStatus = 0;
+      } else if (pinStatus == 2) {
+        systemStatus = 1;
+        pinStatus = 0;
+        attempts++;
+      }
 
-void loop() {
-  tCurr = millis();
-  char userInput = kp.getKey();
-  if (userInput) {
-    if (userInput == '*') clearInput();
-    else {
-      if (N == 5) {
-        if (verifyPIN()) {
-          pinStatus = 1;
-          // toggle between disarmed (0) and armed (2)
-          // if other states, go to disarmed
+      green();
+      stopTone();
+      break;
+    case 1:  // Warning state
+      // Serial.print(tamper);
+      // Serial.print(", ");
+      // Serial.print(presence);
+      // Serial.print(", ");
+      if (pinStatus == 1) {
+        systemStatus = 0;
+        pinStatus = 0;
+        attempts = 0;
+      } else if (pinStatus == 2 && attempts == 2) {
+        systemStatus = 3;
+        pinStatus = 0;
+      } else if (pinStatus == 2) {
+        systemStatus = 1;
+        attempts++;
+        pinStatus = 0;
+      }
+
+      if (tCurr - tDectection > 5200) {
+        // Serial.println("WAIT IS FALSE");
+        wait = false;
+      }
+
+      if (!wait && tamper) {
+        // Serial.print(tamper);
+        // Serial.println("");
+        if (tCurr - tDectection < 15000) {
+          systemStatus = 3;
+        }
+
+        if (presence && tCurr - tDectection < 15000) {
+          systemStatus = 3;
+        }
+
+        if (tCurr - tDectection >= 15000) {
+          tDectection = 0;
         }
       }
 
-      if (N <= 4) {
-        Serial.print("\tUserInput = ");
-        Serial.print(userInput);
-        input[N] = userInput;
-        N++;
+      warningTone();
+      orange();
+      break;
+    case 2:  // Armed state
+      if (pinStatus == 1) {
+        systemStatus = 0;
+        attempts = 0;
+        pinStatus = 0;
       }
 
-      Serial.print("\t ~ \t");
-      Serial.println(input);
+      if (pinStatus == 2 && attempts == 2) {  // TODO: also check for number of attempts
+        systemStatus = 3;
+        pinStatus = 0;
+      }
+
+      if (pinStatus == 2) {  // TODO: also check for number of attempts
+        attempts++;
+        pinStatus = 0;
+      }
+
+
+      if (tamper || presence) {  // if there is presence or tamper, send to warning stage
+        systemStatus = 1;
+        tDectection = tCurr;
+        wait = true;
+      }
+
+      stopTone();
+      red();
+      break;
+    case 3:  // ALARM, panic mode
+      if (pinStatus == 1) {
+        systemStatus = 0;
+        pinStatus = 0;
+        attempts = 0;
+        tDectection = 0;
+      }
+      panicTone();
+      blinkingRed();
+      break;
+  }
+}
+
+// ============= LOOP ============= //
+void loop() {
+  tCurr = millis();
+
+  // Keypad subsystem looping
+  if (N == 5) {
+    if (verifyPIN()) {
+      pinStatus = 1;
+      // toggle between disarmed (0) and armed (2)
+      // if other states, go to disarmed
+    } else {
+      pinStatus = 2;
+    }
+  }
+
+  char userInput = kp.getKey();
+  if (userInput) {
+    if (userInput == '*') clearInput();
+    else if (N <= 4) {
+      input[N] = userInput;
+      N++;
     }
   }
 
 
-  if (tCurr - tPrev >= refreshTime) {
+  tamperDetection = digitalRead(MAGNETIC);
+  if (tamperDetection) {
+    tamper = 1;
+    tTamper = tCurr;
+  } else if (tamperDetection == 0 && tCurr - tTamper >= 5000) {
+    tamper = 0;
+    tTamper = -1;
+  }
 
+
+  controlSystem();
+  // Serial.print(presence);
+  Serial.println(input);
+
+
+  if (tCurr - tPrev >= refreshTime) {
+    tPrev = tCurr;
     distanceCM = ultrasonic.read();
+
     if (distanceCM < 100) {
       presence = 1;
     } else {
       presence = 0;
     }
-
-    tamperDetection = digitalRead(MAGNETIC);
-    if (tamperDetection) {
-      tamper = 1;
-      tTamper = tCurr;
-    } else if (tamperDetection == 0 && tCurr - tTamper >= 5000) {
-      tamper = 0;
-      tTamper = -1;
-    }
-    // else {
-    // (tamperDetection == 0 && tCurr - tTamper < 5000)
-    // do nothing, tCurr is always increment
-    // }
-
-    tPrev = tCurr;
   }
 }
