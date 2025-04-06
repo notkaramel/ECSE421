@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_442" class="java.beans.XMLDecoder">
+ <object class="java.util.Hashtable">
+  <void method="put">
+   <string>component</string>
+   <string>ProcessNetworks</string>
+  </void>
+ </object>
+ <object class="java.util.Hashtable">
+  <void method="put">
+   <string>ColorComponentBackground</string>
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>250</int>
+    <int>250</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>ColorBufferForeground</string>
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>51</int>
+    <int>102</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>Language</string>
+   <string>en</string>
+  </void>
+  <void method="put">
+   <string>FontLabel</string>
+   <object class="java.awt.Font">
+    <string>Fira Code</string>
+    <int>1</int>
+    <int>16</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>ColorBufferBackground</string>
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>255</int>
+    <int>102</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>BasisHTMLAvatar</string>
+   <string>/resources/ProcessNetworks/html/</string>
+  </void>
+  <void method="put">
+   <string>ColorProcessForeground</string>
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>51</int>
+    <int>102</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>ColorButtonBackground</string>
+   <object class="java.awt.Color">
+    <int>240</int>
+    <int>240</int>
+    <int>240</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>SleepFactor</string>
+   <int>3</int>
+  </void>
+  <void method="put">
+   <string>Avatar</string>
+   <boolean>true</boolean>
+  </void>
+  <void method="put">
+   <string>ColorComponentForeground</string>
+   <object class="java.awt.Color">
+    <int>22</int>
+    <int>26</int>
+    <int>23</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>ColorComponentHighlight</string>
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>0</int>
+    <int>0</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>FontSmallLabel</string>
+   <object class="java.awt.Font">
+    <string>SansSerif</string>
+    <int>0</int>
+    <int>12</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>ColorProcessBackground</string>
+   <object class="java.awt.Color">
+    <int>241</int>
+    <int>153</int>
+    <int>255</int>
+    <int>255</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>FontMenu</string>
+   <object class="java.awt.Font">
+    <string>Fira Code</string>
+    <int>1</int>
+    <int>14</int>
+   </object>
+  </void>
+  <void method="put">
+   <string>DefaultModel</string>
+   <string>examples\ES-PN-Kahn.xml</string>
+  </void>
+ </object>
+</java>
